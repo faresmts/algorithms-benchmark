@@ -1,8 +1,5 @@
-#include <iostream>
 #include <vector>
 #include <chrono>
-#include <random>    
-#include <algorithm>
 #include "AlgorithmResult.h"
 
 // Forward declarations
@@ -82,41 +79,3 @@ void mergeSort(std::vector<int>& arr, int l, int r) {
         merge(arr, l, m, r);
     }
 }
-
-// int main() {
-//     // --- Configuração do Teste Aleatório ---
-//     const int TAMANHO_VETOR = 1000000;
-
-//     // Cria o vetor com valores sequenciais
-//     std::vector<int> arr(TAMANHO_VETOR);
-//     for (int i = 0; i < TAMANHO_VETOR; ++i) {
-//         arr[i] = i;
-//     }
-
-//     // Embaralha o vetor para torná-lo aleatório
-//     std::random_device rd;
-//     std::mt19937 g(rd());
-//     std::shuffle(arr.begin(), arr.end(), g);
-
-//     try {
-//         AlgorithmResult result = mergeSortWithMetrics(arr);
-        
-//         std::cout << "MergeSort Results:" << std::endl;
-//         std::cout << "-----------------" << std::endl;
-//         std::cout << "Input size: " << TAMANHO_VETOR << " elements" << std::endl;
-//         std::cout << "Execution time: " << result.execution_time << " ms" << std::endl;
-//         std::cout << "Number of comparisons: " << result.comparisons << std::endl;
-//         std::cout << "Estimated additional memory usage: " << result.memory_usage << " bytes" << std::endl;
-        
-//         std::cout << "\nSorted array: ";
-//         for (int num : result.result) {
-//             std::cout << num << " ";
-//         }
-//         std::cout << std::endl;
-        
-//     } catch (const std::exception& e) {
-//         std::cerr << "Error: " << e.what() << std::endl;
-//     }
-    
-//     return 0;
-// }

@@ -1,19 +1,3 @@
-/*
-Escolha um pivô: selecione um elemento da matriz como pivô. A escolha do pivô pode variar 
-(por exemplo, primeiro elemento, último elemento, elemento aleatório ou mediana).
-
-Particione o Array usando Hoare's partition scheme: Reorganize o array em torno do pivô. Após o particionamento, 
-todos os elementos menores que o pivô estarão à sua esquerda e todos os elementos maiores 
-que o pivô estarão à sua direita. O pivô estará então em sua posição correta e obtemos o índice do pivô.
-
-
-
-Chamada recursiva: aplique recursivamente o mesmo processo aos dois subarrays particionados (esquerda e direita do pivô).
-
-Caso base: a recursão para quando há apenas um elemento restante na submatriz, pois um único elemento já está classificado.
-*/
-
-
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
@@ -241,44 +225,3 @@ void imprimirVetor(vector<int>& vetor, int tamanho) {
     }
     cout << "]" << endl;
 }
-
-
-// int main()
-// {
-//     #ifdef _WIN32
-//         system("cls"); 
-//     #else
-//         system("clear"); 
-//     #endif
-
-//     try {
-//         std::vector<int> test_data = {12, 3, 5, 7, 4, 19, 26};
-        
-//         std::cout << "Original array: ";
-//         for (int num : test_data) {
-//             std::cout << num << " ";
-//         }
-//         std::cout << "\n";
-        
-//         AlgorithmResult result = quickSortWithMetrics(test_data);
-        
-//         std::cout << "\nQuickSort Results:" << std::endl;
-//         std::cout << "----------------" << std::endl;
-//         std::cout << "Input size: " << test_data.size() << " elements" << std::endl;
-//         std::cout << "Execution time: " << result.execution_time << " ms" << std::endl;
-//         std::cout << "Number of comparisons: " << result.comparisons << std::endl;
-//         std::cout << "Estimated stack usage: ~" << result.memory_usage << " bytes" << std::endl;
-        
-//         std::cout << "\nSorted array: ";
-//         for (int num : result.result) {
-//             std::cout << num << " ";
-//         }
-//         std::cout << std::endl;
-        
-//     } catch (const std::exception& e) {
-//         std::cerr << "Error: " << e.what() << std::endl;
-//         return 1;
-//     }
-    
-//     return 0;
-// }

@@ -105,27 +105,3 @@ AlgorithmResult selectLinearWithMetrics(const vector<int>& data, int k) {
     
     return AlgorithmResult::forSelection(result, execution_time, comparison_count, total_additional);
 }
-
-// int main() {
-//     vector<int> data = {12, 3, 5, 7, 4, 19, 26};
-//     int k = 2; // 0-based index (3rd smallest element)
-    
-//     try {
-//         AlgorithmResult result = selectLinearWithMetrics(data, k);
-        
-//         cout << "SelectLinear Results:" << endl;
-//         cout << "-------------------" << endl;
-//         cout << "Input size: " << data.size() << " elements" << endl;
-//         cout << "Finding the " << k + 1 << "-th smallest element (0-based index: " << k << ")" << endl;
-//         cout << "Result: " << result.value << endl;
-//         cout << "Execution time: " << result.execution_time << " ms" << endl;
-//         cout << "Number of comparisons: " << result.comparisons << endl;
-//         cout << "Estimated additional memory usage: " << result.memory_usage << " bytes" << endl;
-        
-//     } catch (const exception& e) {
-//         cerr << "Error: " << e.what() << endl;
-//         return 1;
-//     }
-    
-//     return 0;
-// }

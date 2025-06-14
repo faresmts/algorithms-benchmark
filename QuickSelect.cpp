@@ -1,11 +1,9 @@
-#include <iostream>
 #include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <chrono>
+#include <cstdint>  // for uint64_t
+#include <chrono>  // for timing
+#include <cstdlib>  // for rand()
 #include "AlgorithmResult.h"
 
-std::string getOrdinalSuffix(int num);
 
 /**
  * Partitions the array around a pivot element such that elements smaller than the pivot
@@ -111,39 +109,4 @@ AlgorithmResult findKthSmallestWithMetrics(const std::vector<int>& data, int k) 
     double execution_time = std::chrono::duration<double, std::milli>(end_time - start_time).count();
     
     return AlgorithmResult::forSelection(result, execution_time, comparisons, memory_used);
-}
-
-int main() {
-    std::vector<int> data = {12, 3, 5, 7, 4, 19, 26};
-    int k = 2;  // 0-based index (3rd smallest element)
-    
-    try {
-        AlgorithmResult result = findKthSmallestWithMetrics(data, k);
-        
-        std::cout << "QuickSelect Results:" << std::endl;
-        std::cout << "-------------------" << std::endl;
-        std::cout << "Input size: " << data.size() << " elements" << std::endl;
-        std::cout << "Finding the " << k + 1 << getOrdinalSuffix(k + 1) << " smallest element (0-based index: " << k << ")" << std::endl;
-        std::cout << "Result: " << result.value << std::endl;
-        std::cout << "Execution time: " << result.execution_time << " ms" << std::endl;
-        std::cout << "Number of comparisons: " << result.comparisons << std::endl;
-        std::cout << "Estimated additional memory usage: " << result.memory_usage << " bytes" << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-    
-    return 0;
-}
-
-// Helper function to get ordinal suffix (st, nd, rd, th)
-std::string getOrdinalSuffix(int num) {
-    if (num >= 11 && num <= 13) {
-        return "th";
-    }
-    switch (num % 10) {
-        case 1:  return "st";
-        case 2:  return "nd";
-        case 3:  return "rd";
-        default: return "th";
-    }
 }
