@@ -3,16 +3,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include "AlgorithmResult.h"
 
 std::string getOrdinalSuffix(int num);
-#include <cstdint>
-
-struct QuickSelectResult {
-    int value;              
-    double execution_time;   
-    uint64_t comparisons;    
-    size_t memory_usage;    
-};
 
 /**
  * Partitions the array around a pivot element such that elements smaller than the pivot
@@ -99,37 +92,25 @@ int quickSelect(std::vector<int>& data, int left, int right, int k, uint64_t& co
  * 
  * @param data The input array (will be modified during execution)
  * @param k The position of the element to find (0-based index)
- * @return QuickSelectResult containing the result and performance metrics
+ * @return AlgorithmResult containing the result and performance metrics
  */
-QuickSelectResult findKthSmallestWithMetrics(std::vector<int> data, int k) {
-    if (k < 0 || k >= static_cast<int>(data.size())) {
-        throw std::out_of_range("k is out of bounds");
-    }
-    
-    // Initialize metrics
-    QuickSelectResult result;
-    result.comparisons = 0;
-    result.memory_usage = 0;  // QuickSelect uses O(1) additional space
-    
-    // Seed the random number generator
-    srand(time(0));
-    
-    // Measure execution time
+AlgorithmResult findKthSmallestWithMetrics(const std::vector<int>& data, int k) {
     auto start_time = std::chrono::high_resolution_clock::now();
+    uint64_t comparisons = 0;
     
-    // Execute QuickSelect
-    result.value = quickSelect(data, 0, data.size() - 1, k, result.comparisons);
+    // Make a copy to avoid modifying the original array
+    std::vector<int> data_copy = data;
+    
+    // Calculate initial memory usage (just the copy of the vector)
+    size_t memory_used = sizeof(int) * data_copy.capacity();
+    
+    // Find the k-th smallest element
+    int result = quickSelect(data_copy, 0, data_copy.size() - 1, k, comparisons);
     
     auto end_time = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> duration = end_time - start_time;
-    result.execution_time = duration.count();
+    double execution_time = std::chrono::duration<double, std::milli>(end_time - start_time).count();
     
-    // Calculate memory usage (stack space for recursion is the main additional memory usage)
-    // Each recursive call uses O(1) stack space, and the maximum depth is O(n) in worst case
-    // But in practice, it's O(log n) on average
-    result.memory_usage = sizeof(int) * (data.size() + 1);  // Input array size + stack frames
-    
-    return result;
+    return AlgorithmResult::forSelection(result, execution_time, comparisons, memory_used);
 }
 
 int main() {
@@ -137,7 +118,7 @@ int main() {
     int k = 2;  // 0-based index (3rd smallest element)
     
     try {
-        QuickSelectResult result = findKthSmallestWithMetrics(data, k);
+        AlgorithmResult result = findKthSmallestWithMetrics(data, k);
         
         std::cout << "QuickSelect Results:" << std::endl;
         std::cout << "-------------------" << std::endl;

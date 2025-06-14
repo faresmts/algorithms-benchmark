@@ -20,12 +20,21 @@ Caso base: a recursão para quando há apenas um elemento restante na submatriz,
 #include <random>
 #include <chrono>
 #include <stdexcept>
+#include <cmath>
+#include <algorithm>
+#include "AlgorithmResult.h"
 
 using namespace std;
 
 // Global random number generator (seeded once at program start)
 static random_device rd;
 static mt19937 gen(rd());
+
+// Global comparison counter
+uint64_t quick_sort_comparisons = 0;
+
+// Forward declarations
+void quickSort(std::vector<int>& arr, int low, int high);
 
 
 // Esta função toma o primeiro elemento como pivô, coloca o elemento pivô em sua posição correta 
@@ -37,20 +46,23 @@ int partition(vector<int>& vetor, int low, int high)
     int i = low - 1, j = high + 1;
 
     while (true) {
-
         // Encontre o elemento mais à esquerda maior ou igual ao pivô
         do {
             i++;
-        } while (vetor[i] < pivot);
+            quick_sort_comparisons++;
+        } while (i <= high && vetor[i] < pivot);
 
         // Encontre o elemento mais à direita menor ou igual ao pivô
         do {
             j--;
-        } while (vetor[j] > pivot);
+            quick_sort_comparisons++;
+        } while (j >= low && vetor[j] > pivot);
 
         // Se os dois ponteiros se cruzam
-        if (i >= j)
+        if (i >= j) {
+            quick_sort_comparisons--; // Ajuste para a comparação extra
             return j;
+        }
 
         swap(vetor[i], vetor[j]);
     }
@@ -84,6 +96,30 @@ int partition_r(vector<int>& vetor, int low, int high) {
     swap(vetor[random], vetor[low]);
     
     return partition(vetor, low, high);
+}
+
+/**
+ * Wrapper function for QuickSort with metrics collection
+ * 
+ * @param data The input vector to be sorted
+ * @return AlgorithmResult containing the sorted array and performance metrics
+ */
+AlgorithmResult quickSortWithMetrics(vector<int> data) {
+    auto start_time = chrono::high_resolution_clock::now();
+    quick_sort_comparisons = 0;
+    
+    if (!data.empty()) {
+        quickSort(data, 0, data.size() - 1);
+    }
+    
+    auto end_time = chrono::high_resolution_clock::now();
+    double execution_time = chrono::duration<double, milli>(end_time - start_time).count();
+    
+    // QuickSort uses O(log n) stack space in the best/average case
+    size_t stack_usage = sizeof(int) * (1 + log2(data.size()));
+    
+    return AlgorithmResult::forSorting(std::move(data), execution_time, 
+                                     quick_sort_comparisons, stack_usage);
 }
 
 
@@ -207,59 +243,42 @@ void imprimirVetor(vector<int>& vetor, int tamanho) {
 }
 
 
-int main()
-{
-    #ifdef _WIN32
-        system("cls"); 
-    #else
-        system("clear"); 
-    #endif
+// int main()
+// {
+//     #ifdef _WIN32
+//         system("cls"); 
+//     #else
+//         system("clear"); 
+//     #endif
 
-    int tamanho = 20; // Tamanho do Vetor
-    int min = 1; // Valor Mínimo dos Elementos do Vetor
-    int max = 1000; // // Valor Máximo dos Elementos do Vetor
+//     try {
+//         std::vector<int> test_data = {12, 3, 5, 7, 4, 19, 26};
+        
+//         std::cout << "Original array: ";
+//         for (int num : test_data) {
+//             std::cout << num << " ";
+//         }
+//         std::cout << "\n";
+        
+//         AlgorithmResult result = quickSortWithMetrics(test_data);
+        
+//         std::cout << "\nQuickSort Results:" << std::endl;
+//         std::cout << "----------------" << std::endl;
+//         std::cout << "Input size: " << test_data.size() << " elements" << std::endl;
+//         std::cout << "Execution time: " << result.execution_time << " ms" << std::endl;
+//         std::cout << "Number of comparisons: " << result.comparisons << std::endl;
+//         std::cout << "Estimated stack usage: ~" << result.memory_usage << " bytes" << std::endl;
+        
+//         std::cout << "\nSorted array: ";
+//         for (int num : result.result) {
+//             std::cout << num << " ";
+//         }
+//         std::cout << std::endl;
+        
+//     } catch (const std::exception& e) {
+//         std::cerr << "Error: " << e.what() << std::endl;
+//         return 1;
+//     }
     
-
-    // Para Teste em Vetor Aleatório
-    /*
-    vector<int> vetor = gerarVetorAleatorio(tamanho, min, max);
-
-    printf("Vetor Gerado: \n");
-    imprimirVetor(vetor, tamanho);
-
-    quickSort(vetor, 0, tamanho - 1);
-
-    printf("Vetor Ordenado: \n");
-    imprimirVetor(vetor, tamanho);
-    */
-
-
-    // Para Teste em Vetor Quase Ordenado
-    /*
-    vector<int> vetor = gerarVetorQuaseOrdenado(tamanho, min, max);
-
-    printf("Vetor Gerado: \n");j
-    imprimirVetor(vetor, tamanho);
-
-    quickSort(vetor, 0, tamanho - 1);
-
-    printf("Vetor Ordenado: \n");
-    imprimirVetor(vetor, tamanho);
-    */
-
-
-    // Para Teste em Vetor Inversamente Ordenado
-    /*
-    vector<int> vetor = gerarVetorInversamenteOrdenado(tamanho, min, max);
-
-    printf("Vetor Gerado: \n");
-    imprimirVetor(vetor, tamanho);
-
-    quickSort(vetor, 0, tamanho - 1);
-
-    printf("Vetor Ordenado: \n");
-    imprimirVetor(vetor, tamanho);
-    */
-
-    return 0;
-}
+//     return 0;
+// }

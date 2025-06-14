@@ -2,26 +2,20 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <stdexcept>
+#include "AlgorithmResult.h"
 
 using namespace std;
 using namespace std::chrono;
 
-// calcula o numero de comparações feita
-size_t comparison_count = 0;
-// calcula a estimativa de memoria consumida
-size_t memory_usage = 0;
-
-// struct para as Métricas
-struct Result{
-    int element;
-    long long tempo_execucao_microseg;
-    size_t comparacoes;
-    size_t memoria_adicional;
-};
+// Global counters
+static size_t comparison_count = 0;
+static size_t additional_memory = 0;  // Track additional memory used during execution
 
 
 // encontrar a mediana de um vetor
 int median (vector<int>& arr){
+    // Count the comparison in the sort
     sort(arr.begin(), arr.end(), [](int a, int b) {
         comparison_count++;
         return a < b;
@@ -49,7 +43,7 @@ int select_linear(vector<int> arr, int k){
         medians.push_back(median(group));
     }
 
-    memory_usage += medians.size() * sizeof(int); 
+    additional_memory += medians.capacity() * sizeof(int); 
 
     int med_of_med = select_linear(medians, medians.size() / 2);
 
@@ -69,7 +63,7 @@ int select_linear(vector<int> arr, int k){
         }
     }
 
-    memory_usage += (left.size() + right.size() + equal.size()) * sizeof(int);
+    additional_memory += (left.capacity() + right.capacity() + equal.capacity()) * sizeof(int);
 
     if (k < (int)left.size())
         return select_linear(left, k);
@@ -79,41 +73,59 @@ int select_linear(vector<int> arr, int k){
         return select_linear(right, k - left.size() - equal.size());
 }
 
-
-// facilita para rodar os testes
-Result finalResult(vector<int> vetor, int k){
+/**
+ * Wrapper function for SelectLinear with metrics collection
+ * 
+ * @param data The input vector
+ * @param k The position of the element to find (0-based index)
+ * @return AlgorithmResult containing the result and performance metrics
+ */
+AlgorithmResult selectLinearWithMetrics(const vector<int>& data, int k) {
+    auto start_time = high_resolution_clock::now();
     comparison_count = 0;
-    memory_usage = 0;
-
-    auto begin = high_resolution_clock::now();
-    int elemento_k = select_linear(vetor, k);
-    auto end = high_resolution_clock::now();
-
-    long long tempo_execucao = duration_cast<microseconds>(end - begin).count();
-
-     return {
-        elemento_k,
-        tempo_execucao,
-        comparison_count,
-        memory_usage
-    };
+    
+    if (k < 0 || k >= static_cast<int>(data.size())) {
+        throw out_of_range("k is out of bounds");
+    }
+    
+    // Make a copy to avoid modifying the original array
+    vector<int> data_copy = data;
+    
+    // Execute the algorithm and measure memory usage
+    size_t initial_memory = sizeof(int) * data_copy.capacity();
+    int result = select_linear(data_copy, k);
+    size_t peak_memory = sizeof(int) * data_copy.capacity();
+    
+    auto end_time = high_resolution_clock::now();
+    double execution_time = duration<double, milli>(end_time - start_time).count();
+    
+    // Use the tracked additional memory, but ensure it's at least the difference between peak and initial
+    size_t calculated_memory = (peak_memory > initial_memory) ? peak_memory - initial_memory : 0;
+    size_t total_additional = max(additional_memory, calculated_memory);
+    
+    return AlgorithmResult::forSelection(result, execution_time, comparison_count, total_additional);
 }
 
-//teste
-int main() {
-    vector<int> vetor = {1};
-    int k = vetor.size()/2; 
-
-    Result r = finalResult(vetor, k);
-
-    cout << " Elemento na posicao " << (k + 1) << ": " << r.element << "\n";
-    cout << " Tempo de execucao: " << r.tempo_execucao_microseg << " microssegundos\n";
-    cout << " Comparacoes: " << r.comparacoes << "\n";
-    cout << " Memoria adicional estimada: " << r.memoria_adicional << " bytes\n";
-
-    return 0;
-}
-
-
-
-
+// int main() {
+//     vector<int> data = {12, 3, 5, 7, 4, 19, 26};
+//     int k = 2; // 0-based index (3rd smallest element)
+    
+//     try {
+//         AlgorithmResult result = selectLinearWithMetrics(data, k);
+        
+//         cout << "SelectLinear Results:" << endl;
+//         cout << "-------------------" << endl;
+//         cout << "Input size: " << data.size() << " elements" << endl;
+//         cout << "Finding the " << k + 1 << "-th smallest element (0-based index: " << k << ")" << endl;
+//         cout << "Result: " << result.value << endl;
+//         cout << "Execution time: " << result.execution_time << " ms" << endl;
+//         cout << "Number of comparisons: " << result.comparisons << endl;
+//         cout << "Estimated additional memory usage: " << result.memory_usage << " bytes" << endl;
+        
+//     } catch (const exception& e) {
+//         cerr << "Error: " << e.what() << endl;
+//         return 1;
+//     }
+    
+//     return 0;
+// }

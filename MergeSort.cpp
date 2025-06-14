@@ -3,6 +3,11 @@
 #include <chrono>
 #include <random>    
 #include <algorithm>
+#include "AlgorithmResult.h"
+
+// Forward declarations
+void mergeSort(std::vector<int>& arr, int l, int r);
+void merge(std::vector<int>& arr, int l, int m, int r);
 
 // Variável global para contar as comparações
 long long comparacoes = 0;
@@ -45,54 +50,73 @@ void merge(std::vector<int>& arr, int l, int m, int r) {
     }
 }
 
+// Função auxiliar para medir o Merge Sort
+AlgorithmResult mergeSortWithMetrics(std::vector<int> arr) {
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
+    // Reset global comparison counter
+    comparacoes = 0;
+    
+    // Calculate initial memory usage (input vector)
+    size_t initial_memory = sizeof(int) * arr.capacity();
+    
+    // Execute merge sort
+    mergeSort(arr, 0, arr.size() - 1);
+    
+    auto end_time = std::chrono::high_resolution_clock::now();
+    double execution_time = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+    
+    // Additional memory used by merge sort is the size of the temporary arrays
+    // which is O(n) in the worst case
+    size_t additional_memory = sizeof(int) * arr.size();
+    
+    return AlgorithmResult::forSorting(std::move(arr), execution_time, comparacoes, additional_memory);
+}
+
 // Função principal do Merge Sort
 void mergeSort(std::vector<int>& arr, int l, int r) {
-    if (l >= r) {
-        return;
+    if (l < r) {
+        int m = l + (r - l) / 2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+        merge(arr, l, m, r);
     }
-    int m = l + (r - l) / 2;
-    mergeSort(arr, l, m);
-    mergeSort(arr, m + 1, r);
-    merge(arr, l, m, r);
 }
 
-int main() {
-    // --- Configuração do Teste Aleatório ---
-    const int TAMANHO_VETOR = 1000000;
+// int main() {
+//     // --- Configuração do Teste Aleatório ---
+//     const int TAMANHO_VETOR = 1000000;
 
-    // Cria o vetor com valores sequenciais
-    std::vector<int> arr(TAMANHO_VETOR);
-    for (int i = 0; i < TAMANHO_VETOR; ++i) {
-        arr[i] = i;
-    }
+//     // Cria o vetor com valores sequenciais
+//     std::vector<int> arr(TAMANHO_VETOR);
+//     for (int i = 0; i < TAMANHO_VETOR; ++i) {
+//         arr[i] = i;
+//     }
 
-    // Embaralha o vetor para torná-lo aleatório
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(arr.begin(), arr.end(), g);
+//     // Embaralha o vetor para torná-lo aleatório
+//     std::random_device rd;
+//     std::mt19937 g(rd());
+//     std::shuffle(arr.begin(), arr.end(), g);
 
-    // --- Coleta de Métricas ---
-    comparacoes = 0; // Reseta o contador para o teste
-
-    // 1. Tempo de execução
-    auto start = std::chrono::high_resolution_clock::now();
-
-    mergeSort(arr, 0, TAMANHO_VETOR - 1);
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> diff = end - start;
-
-    // 2. Uso de memória adicional
-    size_t memoria_adicional = TAMANHO_VETOR * sizeof(int);
-
-    std::cout << "\nVetor apos a ordenacao (previa):  ";
-
-    // --- Apresentação dos Resultados ---
-    std::cout << "\n--- Metricas de Desempenho ---" << std::endl;
-    std::cout << "Tamanho do Vetor: " << TAMANHO_VETOR << std::endl;
-    std::cout << "Tempo de execucao: " << diff.count() << " segundos" << std::endl;
-    std::cout << "Contagem de comparacoes: " << comparacoes << std::endl;
-    std::cout << "Estimativa de uso de memoria adicional: " << memoria_adicional << " bytes (" << memoria_adicional / 1024.0 << " KB)" << std::endl;
-
-    return 0;
-}
+//     try {
+//         AlgorithmResult result = mergeSortWithMetrics(arr);
+        
+//         std::cout << "MergeSort Results:" << std::endl;
+//         std::cout << "-----------------" << std::endl;
+//         std::cout << "Input size: " << TAMANHO_VETOR << " elements" << std::endl;
+//         std::cout << "Execution time: " << result.execution_time << " ms" << std::endl;
+//         std::cout << "Number of comparisons: " << result.comparisons << std::endl;
+//         std::cout << "Estimated additional memory usage: " << result.memory_usage << " bytes" << std::endl;
+        
+//         std::cout << "\nSorted array: ";
+//         for (int num : result.result) {
+//             std::cout << num << " ";
+//         }
+//         std::cout << std::endl;
+        
+//     } catch (const std::exception& e) {
+//         std::cerr << "Error: " << e.what() << std::endl;
+//     }
+    
+//     return 0;
+// }
