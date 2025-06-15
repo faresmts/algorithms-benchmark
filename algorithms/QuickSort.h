@@ -114,7 +114,7 @@ inline AlgorithmResult QuickSort::sortWithMetrics(std::vector<int> arr) {
     // QuickSort uses O(log n) stack space in the best/average case
     size_t stack_usage = sizeof(int) * (1 + log2(arr.size()));
     
-    return AlgorithmResult::forSorting(std::move(arr), execution_time, comparisons, stack_usage);
+    return AlgorithmResult::forSorting("QuickSort", std::move(arr), execution_time, comparisons, stack_usage);
 }
 
 #endif // QUICKSORT_H

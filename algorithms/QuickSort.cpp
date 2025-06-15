@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <algorithm>
-#include "AlgorithmResult.h"
+#include "../AlgorithmResult.h"
 
 using namespace std;
 
@@ -102,7 +102,7 @@ AlgorithmResult quickSortWithMetrics(vector<int> data) {
     // QuickSort uses O(log n) stack space in the best/average case
     size_t stack_usage = sizeof(int) * (1 + log2(data.size()));
     
-    return AlgorithmResult::forSorting(std::move(data), execution_time, 
+    return AlgorithmResult::forSorting("QuickSort", std::move(data), execution_time, 
                                      quick_sort_comparisons, stack_usage);
 }
 

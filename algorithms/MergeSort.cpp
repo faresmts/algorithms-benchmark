@@ -67,7 +67,7 @@ AlgorithmResult mergeSortWithMetrics(std::vector<int> arr) {
     // which is O(n) in the worst case
     size_t additional_memory = sizeof(int) * arr.size();
     
-    return AlgorithmResult::forSorting(std::move(arr), execution_time, comparacoes, additional_memory);
+    return AlgorithmResult::forSorting("MergeSort", std::move(arr), execution_time, comparacoes, additional_memory);
 }
 
 // Função principal do Merge Sort

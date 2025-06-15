@@ -1,0 +1,2 @@
+Test Case,Input Size,Execution Time (ms) Quick Sort,Execution Time (ms) Merge Sort,Comparisons Quick Sort,Comparisons Merge Sort,Memory Usage (bytes) Quick Sort,Memory Usage (bytes) Merge Sort
+Random,20,0.005601,0.006082,147,63,21,80

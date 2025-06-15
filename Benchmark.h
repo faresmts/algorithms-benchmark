@@ -52,15 +52,17 @@ public:
         
         if (type == AlgorithmType::SELECTION) {
 
-            
+
         } else if (type == AlgorithmType::SORTING) {
             MergeSort merge_sorter;
             std::vector<int> merge_sort_vector = test_vector;
             first_result = merge_sorter.sortWithMetrics(merge_sort_vector);
+            first_result.algorithm_name = "MergeSort";
 
             QuickSort quick_sorter;
             std::vector<int> quick_sort_vector = test_vector;
             second_result = quick_sorter.sortWithMetrics(quick_sort_vector);
+            second_result.algorithm_name = "QuickSort";
         }
 
         //prinf vector result from first_result
@@ -90,9 +92,51 @@ public:
         std::cout << "Execution time: " << second_result.execution_time << " ms\n";
         std::cout << "Comparisons: " << second_result.comparisons << "\n";
         std::cout << "Memory usage: " << second_result.memory_usage << " bytes\n";
+        
+        // Save results to CSV
+        std::vector<BenchmarkResult> results = {
+            {first_result.algorithm_name, test_case, size, first_result.execution_time, first_result.comparisons, first_result.memory_usage},
+            {second_result.algorithm_name, test_case, size, second_result.execution_time, second_result.comparisons, second_result.memory_usage}
+        };
+        save_results_to_csv(results, "benchmark_results.csv", type);
     }
     
-   
+    static void save_results_to_csv(const std::vector<BenchmarkResult>& results, const std::string& filename, AlgorithmType type) {
+        std::ofstream outfile(filename, std::ios::app);
+        
+        // Write header if file is empty
+        if (outfile.tellp() == 0) {
+            if (type == AlgorithmType::SELECTION) {
+                outfile << "Test Case,Input Size,Execution Time (ms) Select Linear,Execution Time (ms) QuickSelect,Comparisons Select Linear,Comparisons QuickSelect,Memory Usage (bytes) Select Linear,Memory Usage (bytes) QuickSelect\n";
+            } else if (type == AlgorithmType::SORTING) {
+                outfile << "Test Case,Input Size,Execution Time (ms) Quick Sort,Execution Time (ms) Merge Sort,Comparisons Quick Sort,Comparisons Merge Sort,Memory Usage (bytes) Quick Sort,Memory Usage (bytes) Merge Sort\n";
+            }
+        }
+        
+        // Helper function to get test case name
+        auto get_test_case_name = [](TestCaseType test_case) -> std::string {
+            switch (test_case) {
+                case TestCaseType::RANDOM: return "Random";
+                case TestCaseType::NEARLY_SORTED: return "Nearly Sorted";
+                case TestCaseType::REVERSE_SORTED: return "Reverse Sorted";
+                default: return "Unknown";
+            }
+        };
+        
+        // Write results
+        outfile << get_test_case_name(results[0].test_case) << ","
+               << results[0].input_size << ","
+               << results[1].execution_time_ms << ","
+               << results[0].execution_time_ms << ","
+               << results[1].comparisons << ","
+               << results[0].comparisons << ","
+               << results[1].memory_usage << ","
+               << results[0].memory_usage << "\n";
+        
+        outfile.close();
+        std::cout << "\nResults saved to " << filename << "\n";
+    }
+    
 private:
     static std::vector<int> generate_random_vector(size_t size) {
         std::random_device rd;

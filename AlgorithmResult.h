@@ -1,6 +1,7 @@
 #ifndef ALGORITHM_RESULT_H
 #define ALGORITHM_RESULT_H
 
+#include <string>
 #include <vector>
 #include <cstdint>
 
@@ -14,6 +15,7 @@
  *   - result: sorted vector
  */
 struct AlgorithmResult {
+    std::string algorithm_name = "";
     int value = 0;                    // For selection algorithms
     std::vector<int> result;          // For sorting algorithms
     double execution_time = 0.0;      // in milliseconds
@@ -21,13 +23,13 @@ struct AlgorithmResult {
     size_t memory_usage = 0;          // in bytes
 
     // Constructor for selection algorithms
-    static AlgorithmResult forSelection(int val, double time, uint64_t comps, size_t mem) {
-        return {val, {}, time, comps, mem};
+    static AlgorithmResult forSelection(std::string algorithm_name, int val, double time, uint64_t comps, size_t mem) {
+        return {algorithm_name, val, {}, time, comps, mem};
     }
 
     // Constructor for sorting algorithms
-    static AlgorithmResult forSorting(std::vector<int>&& res, double time, uint64_t comps, size_t mem) {
-        return {0, std::move(res), time, comps, mem};
+    static AlgorithmResult forSorting(std::string algorithm_name, std::vector<int>&& res, double time, uint64_t comps, size_t mem) {
+        return {algorithm_name, 0, std::move(res), time, comps, mem};
     }
 };
 
