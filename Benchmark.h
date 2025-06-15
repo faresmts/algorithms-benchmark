@@ -1,66 +1,99 @@
 #ifndef BENCHMARK_H
 #define BENCHMARK_H
 
+#include <iostream>
 #include <vector>
 #include <random>
 #include <algorithm>
 #include <chrono>
 #include <stdexcept>
 #include <string>
+#include <fstream>
+#include "AlgorithmResult.h"
+#include "algorithms/MergeSort.h"       
+#include "algorithms/QuickSort.h"       
 
-// Forward declarations of algorithm functions
-void quickSort(std::vector<int>& vetor);
-void mergeSort(std::vector<int>& arr, int l, int r);
-int quickSelect(std::vector<int>& data, int left, int right, int k, uint64_t& comparison_count);
-int select_linear(std::vector<int> arr, int k);
+enum class AlgorithmType {
+    SELECTION,  
+    SORTING     
+};
+
+enum class TestCaseType {
+    RANDOM,         
+    NEARLY_SORTED,   
+    REVERSE_SORTED  
+};
 
 class Benchmark {
 public:
-    // Enum for different types of test cases
-    enum class TestCaseType {
-        RANDOM,          // Randomly distributed elements
-        NEARLY_SORTED,   // 95% sorted, 5% shuffled
-        REVERSE_SORTED   // Sorted in descending order
-    };
-
-    // Structure to hold benchmark results
     struct BenchmarkResult {
         std::string algorithm_name;
         TestCaseType test_case;
         size_t input_size;
-        double execution_time_ms;  // in milliseconds
-        size_t comparisons;        // number of comparisons
-        size_t memory_usage;       // in bytes
+        double execution_time_ms; 
+        size_t comparisons;        
+        size_t memory_usage;        
     };
 
-    // Generate test vectors of different types and sizes
-    static std::vector<std::vector<int>> generate_test_vectors(size_t size) {
-        std::vector<std::vector<int>> test_vectors;
-        
-        // 1. Random vector
-        test_vectors.push_back(generate_random_vector(size));
-        
-        // 2. Nearly sorted vector (95% sorted, 5% shuffled)
-        test_vectors.push_back(generate_nearly_sorted_vector(size));
-        
-        // 3. Reverse sorted vector
-        test_vectors.push_back(generate_reverse_sorted_vector(size));
-        
-        return test_vectors;
-    }
+    static void run_benchmark(size_t size, AlgorithmType type, TestCaseType test_case) {
+        std::cout << "Running benchmark for size " << size << " and type " << static_cast<int>(type) << "\n";
 
-    // Run benchmarks for all algorithms and test cases
-    static std::vector<BenchmarkResult> run_benchmark() {
-        std::vector<BenchmarkResult> results;
-        std::vector<size_t> sizes = {100000, 500000, 1000000};  // 10^5, 5*10^5, 10^6
-        
-        // This will be implemented later
-        // For now, just return empty results
-        return results;
-    }
+        std::vector<int> test_vector;
+        if (test_case == TestCaseType::RANDOM) {
+            test_vector = generate_random_vector(size);
+        } else if (test_case == TestCaseType::NEARLY_SORTED) {
+            test_vector = generate_nearly_sorted_vector(size);
+        } else if (test_case == TestCaseType::REVERSE_SORTED) {
+            test_vector = generate_reverse_sorted_vector(size);
+        }
 
+        AlgorithmResult first_result;
+        AlgorithmResult second_result;
+        
+        if (type == AlgorithmType::SELECTION) {
+
+            
+        } else if (type == AlgorithmType::SORTING) {
+            MergeSort merge_sorter;
+            std::vector<int> merge_sort_vector = test_vector;
+            first_result = merge_sorter.sortWithMetrics(merge_sort_vector);
+
+            QuickSort quick_sorter;
+            std::vector<int> quick_sort_vector = test_vector;
+            second_result = quick_sorter.sortWithMetrics(quick_sort_vector);
+        }
+
+        //prinf vector result from first_result
+        std::cout << "Vector result: ";
+        for (int i = 0; i < first_result.result.size(); i++) {
+            std::cout << first_result.result[i] << " ";
+        }
+        std::cout << "\n";
+        
+        std::cout << "Algorithm: " << static_cast<int>(type) << "\n";
+        std::cout << "Test case: " << static_cast<int>(test_case) << "\n";
+        std::cout << "Input size: " << size << "\n";
+        std::cout << "Execution time: " << first_result.execution_time << " ms\n";
+        std::cout << "Comparisons: " << first_result.comparisons << "\n";
+        std::cout << "Memory usage: " << first_result.memory_usage << " bytes\n";
+
+        std::cout << "\n QuickSort \n";
+        std::cout << "Vector result: ";
+        for (int i = 0; i < second_result.result.size(); i++) {
+            std::cout << second_result.result[i] << " ";
+        }
+        std::cout << "\n";
+
+        std::cout << "Algorithm: " << static_cast<int>(type) << "\n";
+        std::cout << "Test case: " << static_cast<int>(test_case) << "\n";
+        std::cout << "Input size: " << size << "\n";
+        std::cout << "Execution time: " << second_result.execution_time << " ms\n";
+        std::cout << "Comparisons: " << second_result.comparisons << "\n";
+        std::cout << "Memory usage: " << second_result.memory_usage << " bytes\n";
+    }
+    
+   
 private:
-    // Generate a vector with random values
     static std::vector<int> generate_random_vector(size_t size) {
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -73,18 +106,15 @@ private:
         return vec;
     }
     
-    // Generate a nearly sorted vector (95% sorted, 5% shuffled)
     static std::vector<int> generate_nearly_sorted_vector(size_t size) {
-        // First create a sorted vector
         std::vector<int> vec(size);
         for (size_t i = 0; i < size; ++i) {
             vec[i] = static_cast<int>(i + 1);
         }
         
-        // Then shuffle 5% of the elements
         std::random_device rd;
         std::mt19937 gen(rd());
-        size_t num_shuffles = size / 20;  // 5% of the size
+        size_t num_shuffles = size / 20;
         
         for (size_t i = 0; i < num_shuffles; ++i) {
             std::uniform_int_distribution<size_t> distrib(0, size - 1);
@@ -96,7 +126,6 @@ private:
         return vec;
     }
     
-    // Generate a reverse sorted vector
     static std::vector<int> generate_reverse_sorted_vector(size_t size) {
         std::vector<int> vec(size);
         for (size_t i = 0; i < size; ++i) {
