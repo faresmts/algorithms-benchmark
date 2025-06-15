@@ -1,0 +1,9 @@
+Test Case,Input Size,Execution Time (ms) Select Linear,Execution Time (ms) QuickSelect,Comparisons Select Linear,Comparisons QuickSelect,Memory Usage (bytes) Select Linear,Memory Usage (bytes) QuickSelect
+Random,10,0.009417,36,100
+Reverse Sorted,10,0.007855,21,92
+Reverse Sorted,10,0.006222,21,92
+Reverse Sorted,10,0.006212,21,92
+Reverse Sorted,10,0.009378,21,92
+Reverse Sorted,10,0.010981,37,128
+Reverse Sorted,10,0.000581,0.009247,10,37,40,128
+Random,10,0.001523,0.007134,37,41,40,100

@@ -4,8 +4,8 @@
 
 int main() {
 
-    AlgorithmType algorithm_type = AlgorithmType::SORTING;
-    size_t vector_size = 20;
+    AlgorithmType algorithm_type = AlgorithmType::SELECTION;
+    size_t vector_size = 10;
     TestCaseType test_case = TestCaseType::RANDOM;
     
     try {

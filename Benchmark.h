@@ -11,7 +11,9 @@
 #include <fstream>
 #include "AlgorithmResult.h"
 #include "algorithms/MergeSort.h"       
-#include "algorithms/QuickSort.h"       
+#include "algorithms/QuickSort.h"      
+#include "algorithms/SelectLinear.h" 
+#include "algorithms/QuickSelect.h"
 
 enum class AlgorithmType {
     SELECTION,  
@@ -47,12 +49,27 @@ public:
             test_vector = generate_reverse_sorted_vector(size);
         }
 
+        //print vector
+        std::cout << "Test vector: ";
+        for (int i = 0; i < 10; i++) {
+            std::cout << test_vector[i] << " ";
+        }
+        std::cout << "\n";
+
         AlgorithmResult first_result;
         AlgorithmResult second_result;
         
         if (type == AlgorithmType::SELECTION) {
+            SelectLinear select_linear;
+            std::vector<int> select_linear_vector = test_vector;
+            // 7th smallest element (index 6 in 0-based indexing)
+            first_result = select_linear.selectLinearWithMetrics(select_linear_vector, 6);
+            first_result.algorithm_name = "SelectLinear";
 
-
+            QuickSelect quick_select;
+            std::vector<int> quick_select_vector = test_vector;
+            second_result = quick_select.quickSelectWithMetrics(quick_select_vector, 6);
+            second_result.algorithm_name = "QuickSelect";
         } else if (type == AlgorithmType::SORTING) {
             MergeSort merge_sorter;
             std::vector<int> merge_sort_vector = test_vector;
@@ -65,46 +82,27 @@ public:
             second_result.algorithm_name = "QuickSort";
         }
 
-        //prinf vector result from first_result
-        std::cout << "Vector result: ";
-        for (int i = 0; i < first_result.result.size(); i++) {
-            std::cout << first_result.result[i] << " ";
-        }
-        std::cout << "\n";
-        
-        std::cout << "Algorithm: " << static_cast<int>(type) << "\n";
-        std::cout << "Test case: " << static_cast<int>(test_case) << "\n";
-        std::cout << "Input size: " << size << "\n";
-        std::cout << "Execution time: " << first_result.execution_time << " ms\n";
-        std::cout << "Comparisons: " << first_result.comparisons << "\n";
-        std::cout << "Memory usage: " << first_result.memory_usage << " bytes\n";
+        std::cout << "First result: " << first_result.value << "\n";
+        std::cout << "Second result: " << second_result.value << "\n";
 
-        std::cout << "\n QuickSort \n";
-        std::cout << "Vector result: ";
-        for (int i = 0; i < second_result.result.size(); i++) {
-            std::cout << second_result.result[i] << " ";
-        }
-        std::cout << "\n";
-
-        std::cout << "Algorithm: " << static_cast<int>(type) << "\n";
-        std::cout << "Test case: " << static_cast<int>(test_case) << "\n";
-        std::cout << "Input size: " << size << "\n";
-        std::cout << "Execution time: " << second_result.execution_time << " ms\n";
-        std::cout << "Comparisons: " << second_result.comparisons << "\n";
-        std::cout << "Memory usage: " << second_result.memory_usage << " bytes\n";
-        
-        // Save results to CSV
         std::vector<BenchmarkResult> results = {
             {first_result.algorithm_name, test_case, size, first_result.execution_time, first_result.comparisons, first_result.memory_usage},
             {second_result.algorithm_name, test_case, size, second_result.execution_time, second_result.comparisons, second_result.memory_usage}
         };
-        save_results_to_csv(results, "benchmark_results.csv", type);
+
+        std::string filename = "";
+        if (type == AlgorithmType::SELECTION) {
+            filename = "selection_benchmark_results.csv";
+        } else if (type == AlgorithmType::SORTING) {
+            filename = "sorting_benchmark_results.csv";
+        }
+
+        save_results_to_csv(results, filename, type);
     }
     
     static void save_results_to_csv(const std::vector<BenchmarkResult>& results, const std::string& filename, AlgorithmType type) {
         std::ofstream outfile(filename, std::ios::app);
         
-        // Write header if file is empty
         if (outfile.tellp() == 0) {
             if (type == AlgorithmType::SELECTION) {
                 outfile << "Test Case,Input Size,Execution Time (ms) Select Linear,Execution Time (ms) QuickSelect,Comparisons Select Linear,Comparisons QuickSelect,Memory Usage (bytes) Select Linear,Memory Usage (bytes) QuickSelect\n";
@@ -113,7 +111,6 @@ public:
             }
         }
         
-        // Helper function to get test case name
         auto get_test_case_name = [](TestCaseType test_case) -> std::string {
             switch (test_case) {
                 case TestCaseType::RANDOM: return "Random";
@@ -123,7 +120,6 @@ public:
             }
         };
         
-        // Write results
         outfile << get_test_case_name(results[0].test_case) << ","
                << results[0].input_size << ","
                << results[1].execution_time_ms << ","
