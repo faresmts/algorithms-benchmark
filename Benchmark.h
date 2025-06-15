@@ -40,21 +40,19 @@ public:
     static void run_benchmark(size_t size, AlgorithmType type, TestCaseType test_case) {
         std::cout << "Running benchmark for size " << size << " and type " << static_cast<int>(type) << "\n";
 
+        std::string test_case_name;
+
         std::vector<int> test_vector;
         if (test_case == TestCaseType::RANDOM) {
             test_vector = generate_random_vector(size);
+            test_case_name = "random";
         } else if (test_case == TestCaseType::NEARLY_SORTED) {
             test_vector = generate_nearly_sorted_vector(size);
+            test_case_name = "nearly_sorted";
         } else if (test_case == TestCaseType::REVERSE_SORTED) {
             test_vector = generate_reverse_sorted_vector(size);
+            test_case_name = "reverse_sorted";
         }
-
-        //print vector
-        std::cout << "Test vector: ";
-        for (int i = 0; i < 10; i++) {
-            std::cout << test_vector[i] << " ";
-        }
-        std::cout << "\n";
 
         AlgorithmResult first_result;
         AlgorithmResult second_result;
@@ -92,9 +90,9 @@ public:
 
         std::string filename = "";
         if (type == AlgorithmType::SELECTION) {
-            filename = "selection_benchmark_results.csv";
+            filename = test_case_name + "_selection_benchmark_results.csv";
         } else if (type == AlgorithmType::SORTING) {
-            filename = "sorting_benchmark_results.csv";
+            filename = test_case_name + "_sorting_benchmark_results.csv";
         }
 
         save_results_to_csv(results, filename, type);
