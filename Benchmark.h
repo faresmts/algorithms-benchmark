@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <string>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include "AlgorithmResult.h"
 #include "algorithms/MergeSort.h"       
 #include "algorithms/QuickSort.h"      
@@ -26,6 +28,13 @@ enum class TestCaseType {
     REVERSE_SORTED  
 };
 
+struct BenchmarkConfig {
+    AlgorithmType algorithm_type;
+    size_t vector_size;
+    TestCaseType test_case;
+    std::string test_name;
+};
+
 class Benchmark {
 public:
     struct BenchmarkResult {
@@ -37,27 +46,47 @@ public:
         size_t memory_usage;        
     };
 
-    static void run_benchmark(size_t size, AlgorithmType type, TestCaseType test_case) {
-        std::cout << "Running benchmark for size " << size << " and type " << static_cast<int>(type) << "\n";
+    static std::string get_test_case_name(TestCaseType test_case) {
+        switch (test_case) {
+            case TestCaseType::RANDOM: return "random";
+            case TestCaseType::NEARLY_SORTED: return "nearly_sorted";
+            case TestCaseType::REVERSE_SORTED: return "reverse_sorted";
+            default: return "unknown";
+        }
+    }
 
-        std::string test_case_name;
+    static std::string generate_filename(const BenchmarkConfig& config) {
+        std::string algo_type = (config.algorithm_type == AlgorithmType::SELECTION) ? "selection" : "sorting";
+        std::string test_case = get_test_case_name(config.test_case);
+        
+        std::ostringstream filename;
+        filename << algo_type << "_" 
+                << test_case << "_" 
+                << config.vector_size / 1000 << "k_benchmark.csv";
+                
+        return filename.str();
+    }
+
+    static void run_benchmark(const BenchmarkConfig& config) {
+        std::cout << "Running benchmark: " << config.test_name << "\n";
 
         std::vector<int> test_vector;
-        if (test_case == TestCaseType::RANDOM) {
-            test_vector = generate_random_vector(size);
-            test_case_name = "random";
-        } else if (test_case == TestCaseType::NEARLY_SORTED) {
-            test_vector = generate_nearly_sorted_vector(size);
-            test_case_name = "nearly_sorted";
-        } else if (test_case == TestCaseType::REVERSE_SORTED) {
-            test_vector = generate_reverse_sorted_vector(size);
-            test_case_name = "reverse_sorted";
+        switch (config.test_case) {
+            case TestCaseType::RANDOM:
+                test_vector = generate_random_vector(config.vector_size);
+                break;
+            case TestCaseType::NEARLY_SORTED:
+                test_vector = generate_nearly_sorted_vector(config.vector_size);
+                break;
+            case TestCaseType::REVERSE_SORTED:
+                test_vector = generate_reverse_sorted_vector(config.vector_size);
+                break;
         }
 
         AlgorithmResult first_result;
         AlgorithmResult second_result;
         
-        if (type == AlgorithmType::SELECTION) {
+        if (config.algorithm_type == AlgorithmType::SELECTION) {
             SelectLinear select_linear;
             std::vector<int> select_linear_vector = test_vector;
             // 7th smallest element (index 6 in 0-based indexing)
@@ -68,7 +97,7 @@ public:
             std::vector<int> quick_select_vector = test_vector;
             second_result = quick_select.quickSelectWithMetrics(quick_select_vector, 6);
             second_result.algorithm_name = "QuickSelect";
-        } else if (type == AlgorithmType::SORTING) {
+        } else if (config.algorithm_type == AlgorithmType::SORTING) {
             MergeSort merge_sorter;
             std::vector<int> merge_sort_vector = test_vector;
             first_result = merge_sorter.sortWithMetrics(merge_sort_vector);
@@ -84,18 +113,14 @@ public:
         std::cout << "Second result: " << second_result.value << "\n";
 
         std::vector<BenchmarkResult> results = {
-            {first_result.algorithm_name, test_case, size, first_result.execution_time, first_result.comparisons, first_result.memory_usage},
-            {second_result.algorithm_name, test_case, size, second_result.execution_time, second_result.comparisons, second_result.memory_usage}
+            {first_result.algorithm_name, config.test_case, config.vector_size, 
+             first_result.execution_time, first_result.comparisons, first_result.memory_usage},
+            {second_result.algorithm_name, config.test_case, config.vector_size, 
+             second_result.execution_time, second_result.comparisons, second_result.memory_usage}
         };
 
-        std::string filename = "";
-        if (type == AlgorithmType::SELECTION) {
-            filename = test_case_name + "_selection_benchmark_results.csv";
-        } else if (type == AlgorithmType::SORTING) {
-            filename = test_case_name + "_sorting_benchmark_results.csv";
-        }
-
-        save_results_to_csv(results, filename, type);
+        std::string filename = generate_filename(config);
+        save_results_to_csv(results, filename, config.algorithm_type);
     }
     
     static void save_results_to_csv(const std::vector<BenchmarkResult>& results, const std::string& filename, AlgorithmType type) {
