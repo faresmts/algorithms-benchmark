@@ -68,8 +68,6 @@ public:
     }
 
     static void run_benchmark(const BenchmarkConfig& config) {
-        std::cout << "Running benchmark: " << config.test_name << "\n";
-
         std::vector<int> test_vector;
         switch (config.test_case) {
             case TestCaseType::RANDOM:
@@ -108,9 +106,6 @@ public:
             second_result = quick_sorter.sortWithMetrics(quick_sort_vector);
             second_result.algorithm_name = "QuickSort";
         }
-
-        std::cout << "First result: " << first_result.value << "\n";
-        std::cout << "Second result: " << second_result.value << "\n";
 
         std::vector<BenchmarkResult> results = {
             {first_result.algorithm_name, config.test_case, config.vector_size, 
@@ -153,7 +148,6 @@ public:
                << results[0].memory_usage << "\n";
         
         outfile.close();
-        std::cout << "\nResults saved to " << filename << "\n";
     }
     
 private:
