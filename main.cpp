@@ -22,8 +22,8 @@ void run_benchmark_suite(size_t execution_count) {
         // {AlgorithmType::SORTING, 500000, TestCaseType::RANDOM, "SORTING 500K RANDOM"},
         // {AlgorithmType::SORTING, 500000, TestCaseType::REVERSE_SORTED, "SORTING 500K REVERSE_SORTED"},
         // {AlgorithmType::SORTING, 1000000, TestCaseType::NEARLY_SORTED, "SORTING 1M NEARLY_SORTED"},
-        // {AlgorithmType::SORTING, 1000000, TestCaseType::RANDOM, "SORTING 1M RANDOM"},
-        {AlgorithmType::SORTING, 1000000, TestCaseType::REVERSE_SORTED, "SORTING 1M REVERSE_SORTED"}
+        {AlgorithmType::SORTING, 1000000, TestCaseType::RANDOM, "SORTING 1M RANDOM"},
+        // {AlgorithmType::SORTING, 1000000, TestCaseType::REVERSE_SORTED, "SORTING 1M REVERSE_SORTED"}
     };
 
     for (const auto& config : configurations) {
